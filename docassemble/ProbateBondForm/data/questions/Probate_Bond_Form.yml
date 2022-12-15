@@ -228,7 +228,7 @@ fields:
     maxlength: 2
   - "Zip": users[0].address.zip
     maxlength: 5
-  - "Phone Number": users[0].phone_number
+  - "Phone Number (no dashes or spaces)": users[0].phone_number
     maxlength: 11
 ---
 id: Fiduciary 2 information
@@ -256,7 +256,7 @@ fields:
     maxlength: 2
   - "Zip": users[1].address.zip
     maxlength: 5
-  - "Phone Number": users[1].phone_number
+  - "Phone Number (no dashes or spaces)": users[1].phone_number
     maxlength: 11
 ---
 id: What is the bond number
@@ -296,7 +296,7 @@ fields:
     maxlength: 2
   - "Zip": suretor[0].address.zip
     maxlength: 5
-  - "Phone Number": suretor[0].phone_number
+  - "Phone Number (no dashes or spaces)": suretor[0].phone_number
     maxlength: 11
 ---
 id: Suretor 2 information
@@ -320,7 +320,7 @@ fields:
     maxlength: 2
   - "Zip": suretor[1].address.zip
     maxlength: 5
-  - "Phone Number": suretor[1].phone_number
+  - "Phone Number (no dashes or spaces)": suretor[1].phone_number
     maxlength: 11
 ---
 id: Number of personal sureties 
