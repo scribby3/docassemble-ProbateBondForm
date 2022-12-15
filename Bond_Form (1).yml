@@ -1,0 +1,552 @@
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+  - docassemble.ALMassachusetts:al_massachusetts.yml
+  - docassemble.MassAccess:massaccess.yml
+---
+metadata:
+  title: |
+    Probate Bond Form
+  short title: |
+    Bond Form
+  tags:
+    - ES-00-00-00-00
+    - MO-00-00-00-00
+  authors:
+    - Spencer Cribby
+---
+mandatory: True
+comment: |
+  Global interview metadata
+variable name: interview_metadata["Bond_Form"]
+data:
+  al_weaver_version: "1.7.0"
+  generated on: "2022-11-22"
+  title: >-
+    Probate Bond Form
+  short title: >-
+    Bond Form
+  description: |-
+    File a probate form as an executor or administrator of an estate
+  original_form: >-
+    https://courtforms.jud.state.ma.us/publicforms/PFC0008
+  allowed courts: 
+    - "Probate and Family Court"
+  categories:
+    - "MO-00-00-00-00"
+    - "ES-00-00-00-00"
+  typical role: "na"
+  generate download screen: True
+---
+code: |
+  interview_metadata['main_interview_key'] =  'Bond_Form'
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "MA"
+---
+code: |
+  github_repo_name =  'docassemble-BondForm'
+---
+code: |
+  interview_short_title = "File a probate bond"
+---
+code: |
+  al_form_type = "existing_case" 
+---
+objects:
+  - users: ALPeopleList.using(there_are_any=True)
+---
+sections:
+  - review_Bond_Form: Review your answers
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_Bond_Form
+code: |
+  # Set the allowed courts for this interview
+  allowed_courts = interview_metadata["Bond_Form"]["allowed courts"]
+  nav.set_section("review_Bond_Form")
+  user_role = "na"
+  bond_sureties_without
+  suretor1_name_first
+  bond_penal_value
+  real_estate_value
+  suretor3_address_on_one_line
+  set_progress(11)
+  fiduciary_name
+  users.gather()
+  set_parts(subtitle=str(users))
+  docket_number
+  set_progress(22)
+  trial_court.division
+  signature_date
+  set_progress(33)
+  users[1].address.address
+  set_progress(44)
+  users[1].phone_number
+  users[2].address.address
+  set_progress(55)
+  users[2].phone_number
+  set_progress(66)
+  suretor1_signature
+  suretor2_signature
+  suretor3_signature
+  interview_order_Bond_Form = True
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for standalone interviews.
+  Delete mandatory: True to include in another interview
+mandatory: True
+code: |
+  al_intro_screen
+  Bond_Form_intro
+  interview_order_Bond_Form
+  signature_date
+  # Store anonymous data for analytics / statistics
+  store_variables_snapshot(
+      persistent=True,
+      data={
+          "zip": showifdef("users[0].address.zip"),
+          "reached_interview_end": True,
+      },
+  )
+  Bond_Form_preview_question
+  basic_questions_signature_flow    
+  suretor1_signature
+  suretor2_signature
+  suretor3_signature
+  Bond_Form_download
+---
+comment: |
+  This question is used to introduce your interview. Please customize
+id: Probate_Bond_Form
+continue button field: Bond_Form_intro
+question: |
+  Probate Bond Form
+subquestion: |
+  This form will take 10-15 minutes to fill out.
+  
+  Need to have the docket number; court division; real estate and personal real estate value; and the corporate surety bond number as well as the bond penal sum if applicable.
+  
+  Must have two fiduciaries; and two personal sureties or a corporate surety.
+---
+id: Bond Type
+question: |
+  Bond Type
+subquestion: |
+  What type of surety is attached to the bond?
+fields:
+  - "Bond sureties without": bond_sureties_without
+    datatype: yesno
+  - "Bond sureties personal": bond_sureties_personal
+    datatype: yesno
+  - "Bond number": bond_number
+    datatype: integer
+    min: 0
+  - "Bond sureties corporate": bond_sureties_corporate
+    datatype: yesno
+---
+id: Personal Surety
+question: |
+  Personal Surety
+subquestion: |
+  Please provide the following information for both personal sureties.
+fields:
+  - "Suretor1 name first": suretor1_name_first
+    maxlength: 32
+  - "Suretor1 name middle": suretor1_name_middle
+    maxlength: 24
+  - "Suretor1 name last": suretor1_name_last
+    maxlength: 31
+  - "Suretor1 address unit": suretor1_address_unit
+    maxlength: 16
+  - "Suretor1 address address": suretor1_address_address
+    maxlength: 69
+  - "Suretor1 address city": suretor1_address_city
+    maxlength: 21
+  - "Suretor1 address zip": suretor1_address_zip
+    maxlength: 10
+  - "Suretor1 phone number": suretor1_phone_number
+    maxlength: 27
+  - "Suretor2 name first": suretor2_name_first
+    maxlength: 31
+  - "Suretor2 name middle": suretor2_name_middle
+    maxlength: 24
+  - "Suretor2 name last": suretor2_name_last
+    maxlength: 31
+  - "Suretor2 address address": suretor2_address_address
+    maxlength: 69
+  - "Suretor2 address unit": suretor2_address_unit
+    maxlength: 16
+  - "Suretor2 address city": suretor2_address_city
+    maxlength: 21
+  - "Suretor2 address zip": suretor2_address_zip
+    maxlength: 10
+  - "Suretor2 phone number": suretor2_phone_number
+    maxlength: 27
+---
+id: Penal Value
+question: |
+  Penal Value
+subquestion: |
+  If applicable what is the penal sum of the bond.
+fields:
+  - "Bond penal value": bond_penal_value
+    datatype: currency
+    min: 0
+---
+id: Estate Value
+question: |
+  Estate Value
+subquestion: |
+  What is the value of both the real estate and personal real estate?
+fields:
+  - "Real estate value": real_estate_value
+    datatype: currency
+    min: 0
+  - "Real estate personal value": real_estate_personal_value
+    datatype: currency
+    min: 0
+---
+id: Corporate Surety
+question: |
+  Corporate Surety
+subquestion: |
+  If applicable what is the corporate surety's information?
+fields:
+  - "Suretor3 address on one line": suretor3_address_on_one_line
+    maxlength: 49
+  - "Suretor3 name": suretor3_name
+    maxlength: 37
+  - "Suretor3 address state": suretor3_address_state
+    maxlength: 24
+---
+id: Accepting Position
+question: |
+  Accepting Position
+subquestion: |
+  As fiduciary, you accept appointment as?
+fields:
+  - "Fiduciary name": fiduciary_name
+    maxlength: 53
+---
+id: preview Bond_Form
+question: |
+  Preview your form before you sign it
+subquestion: |
+  Here is a preview of the form you will sign on the next page.   
+  
+  ${ al_court_bundle.as_pdf(key='preview') }
+
+  Click the image to open it in a new tab. Click the "Edit answers" button
+  to edit your answers.
+
+  ${ action_button_html(url_action('review_Bond_Form'), label='Edit answers', color='info') }
+  
+  Remember to come back to this window to continue and sign your form.
+continue button field: Bond_Form_preview_question    
+---
+code: |
+  signature_fields = ['users[1].signature', 'users[2].signature', 'suretor1_signature', 'suretor2_signature', 'suretor3_signature']
+---
+code: |
+  # This is a placeholder for the addresses that will be searched
+  # for matching address to court. Edit if court venue is based on 
+  # a different address than the user's
+  addresses_to_search = [user.address for user in users]
+---
+id: Bond Form review screen
+event: review_Bond_Form
+question: |
+  Review your answers
+review:
+  - Edit: users.revisit
+    button: |
+      **Users**
+
+      % for item in users:
+        * ${ item }
+      % endfor
+  - Edit: bond_sureties_without
+    button: |
+      **Bond sureties without**:
+      ${ word(yesno(bond_sureties_without)) }
+  - Edit: docket_number
+    button: |
+      **Docket number**:
+      ${ docket_number }
+  - Edit: bond_sureties_personal
+    button: |
+      **Bond sureties personal**:
+      ${ word(yesno(bond_sureties_personal)) }
+  - Edit: bond_number
+    button: |
+      **Bond number**:
+      ${ bond_number }
+  - Edit: bond_sureties_corporate
+    button: |
+      **Bond sureties corporate**:
+      ${ word(yesno(bond_sureties_corporate)) }
+  - Edit: suretor1_name_first
+    button: |
+      **Suretor1 name first**:
+      ${ suretor1_name_first }
+  - Edit: suretor1_name_middle
+    button: |
+      **Suretor1 name middle**:
+      ${ suretor1_name_middle }
+  - Edit: suretor1_name_last
+    button: |
+      **Suretor1 name last**:
+      ${ suretor1_name_last }
+  - Edit: trial_court
+    button: |
+      **Trial court**
+  
+      % if defined("trial_court.division"):
+      * division: ${ trial_court.division }
+      % endif
+  - Edit: suretor1_address_unit
+    button: |
+      **Suretor1 address unit**:
+      ${ suretor1_address_unit }
+  - Edit: suretor1_address_address
+    button: |
+      **Suretor1 address address**:
+      ${ suretor1_address_address }
+  - Edit: suretor1_address_city
+    button: |
+      **Suretor1 address city**:
+      ${ suretor1_address_city }
+  - Edit: suretor1_address_zip
+    button: |
+      **Suretor1 address zip**:
+      ${ suretor1_address_zip }
+  - Edit: suretor1_phone_number
+    button: |
+      **Suretor1 phone number**:
+      ${ suretor1_phone_number }
+  - Edit: signature_date
+    button: |
+      **Date of signature**:
+      ${ signature_date }
+  - Edit: suretor2_name_first
+    button: |
+      **Suretor2 name first**:
+      ${ suretor2_name_first }
+  - Edit: suretor2_name_middle
+    button: |
+      **Suretor2 name middle**:
+      ${ suretor2_name_middle }
+  - Edit: suretor2_name_last
+    button: |
+      **Suretor2 name last**:
+      ${ suretor2_name_last }
+  - Edit: real_estate_value
+    button: |
+      **Real estate value**:
+      ${ currency(real_estate_value) }
+  - Edit: real_estate_personal_value
+    button: |
+      **Real estate personal value**:
+      ${ currency(real_estate_personal_value) }
+  - Edit: suretor2_address_address
+    button: |
+      **Suretor2 address address**:
+      ${ suretor2_address_address }
+  - Edit: suretor2_address_unit
+    button: |
+      **Suretor2 address unit**:
+      ${ suretor2_address_unit }
+  - Edit: bond_penal_value
+    button: |
+      **Bond penal value**:
+      ${ currency(bond_penal_value) }
+  - Edit: suretor2_address_city
+    button: |
+      **Suretor2 address city**:
+      ${ suretor2_address_city }
+  - Edit: suretor2_address_zip
+    button: |
+      **Suretor2 address zip**:
+      ${ suretor2_address_zip }
+  - Edit: suretor2_phone_number
+    button: |
+      **Suretor2 phone number**:
+      ${ suretor2_phone_number }
+  - Edit: suretor3_address_on_one_line
+    button: |
+      **Suretor3 address on one line**:
+      ${ suretor3_address_on_one_line }
+  - Edit: fiduciary_name
+    button: |
+      **Fiduciary name**:
+      ${ fiduciary_name }
+  - Edit: suretor3_name
+    button: |
+      **Suretor3 name**:
+      ${ suretor3_name }
+  - Edit: suretor1_signature
+    button: |
+      **suretor1_signature**:
+      ${ suretor1_signature }
+  - Edit: suretor2_signature
+    button: |
+      **suretor2_signature**:
+      ${ suretor2_signature }
+  - Edit: suretor3_address_state
+    button: |
+      **Suretor3 address state**:
+      ${ suretor3_address_state }
+  - Edit: suretor3_signature
+    button: |
+      **suretor3_signature**:
+      ${ suretor3_signature }
+---
+continue button field: users.revisit
+question: |
+  Edit users
+subquestion: |
+  ${ users.table }
+
+  ${ users.add_action() }
+---
+table: users.table
+rows: users
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.last") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.zip") else ""
+  - Phone number: |
+      row_item.phone_number if defined("row_item.phone_number") else ""
+  - Signature: |
+      row_item.signature if defined("row_item.signature") else ""
+edit:
+  - name.last
+  - address.zip
+  - phone_number
+  - signature
+confirm: True
+
+---
+id: download Bond_Form
+event: Bond_Form_download
+question: |
+  All done
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+
+  ${ action_button_html(url_action('review_Bond_Form'), label='Edit answers', color='info') }
+  
+  
+  ${ al_user_bundle.download_list_html() }
+  
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+progress: 100
+---
+# ALDocument objects specify the metadata for each template
+objects:
+  - Bond_Form_Post_interview_instructions: ALDocument.using(title="Instructions", filename="Bond_Form_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+  - Bond_Form_attachment: ALDocument.using(title="Probate Bond Form", filename="Bond_Form", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[Bond_Form_Post_interview_instructions, Bond_Form_attachment], filename="Bond_Form", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[Bond_Form_attachment],  filename="Bond_Form", title="All forms to deliver to court", enabled=True)
+---
+# Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
+# used for "preview" and "final" keys, and logic in the template checks the value of 
+# `i` to show or hide the user's signature
+attachments:
+  - name: Post-interview-Instructions
+    filename: Bond_Form_next_steps
+    docx template file: Bond_Form_next_steps.docx
+    variable name: Bond_Form_Post_interview_instructions[i]
+  - name: Bond Form
+    filename: Bond_Form
+    variable name: Bond_Form_attachment[i]
+    skip undefined: True
+    pdf template file: Bond_Form.pdf
+    fields:
+      - "users1_name_last__2": ${ users[0].name.last }
+      - "users1_name_last__1": ${ users[0].name.last }
+      - "users1_name_first__2": ${ users[0].name.first }
+      - "users1_name_first__1": ${ users[0].name.first }
+      - "users1_name_middle__2": ${ users[0].name.middle }
+      - "users1_name_middle__1": ${ users[0].name.middle }
+      - "bond_sureties_without": ${ bond_sureties_without }
+      - "docket_number__1": ${ docket_number }
+      - "docket_number__2": ${ docket_number }
+      - "bond_sureties_personal": ${ bond_sureties_personal }
+      - "bond_number__1": ${ bond_number }
+      - "bond_number__2": ${ bond_number }
+      - "bond_sureties_corporate": ${ bond_sureties_corporate }
+      - "suretor1_name_first": ${ suretor1_name_first }
+      - "suretor1_name_middle": ${ suretor1_name_middle }
+      - "suretor1_name_last": ${ suretor1_name_last }
+      - "trial_court_division": ${ trial_court.division }
+      - "suretor1_address_unit": ${ suretor1_address_unit }
+      - "suretor1_address_address": ${ suretor1_address_address }
+      - "suretor1_address_city": ${ suretor1_address_city }
+      - "suretor1_address_zip": ${ suretor1_address_zip }
+      - "suretor1_phone_number": ${ suretor1_phone_number }
+      - "signature_date__3": ${ signature_date }
+      - "signature_date__4": ${ signature_date }
+      - "signature_date__1": ${ signature_date }
+      - "signature_date__2": ${ signature_date }
+      - "suretor2_name_first": ${ suretor2_name_first }
+      - "suretor2_name_middle": ${ suretor2_name_middle }
+      - "suretor2_name_last": ${ suretor2_name_last }
+      - "real_estate_value": ${ currency(real_estate_value) }
+      - "real_estate_personal_value": ${ currency(real_estate_personal_value) }
+      - "suretor2_address_address": ${ suretor2_address_address }
+      - "suretor2_address_unit": ${ suretor2_address_unit }
+      - "bond_penal_value__1": ${ currency(bond_penal_value) }
+      - "bond_penal_value__2": ${ currency(bond_penal_value) }
+      - "suretor2_address_city": ${ suretor2_address_city }
+      - "suretor2_address_zip": ${ suretor2_address_zip }
+      - "suretor2_phone_number": ${ suretor2_phone_number }
+      - "users2_name_middle_initial": ${ users[1].name.middle_initial() }
+      - "users2_name_last": ${ users[1].name.last }
+      - "users2_name_first": ${ users[1].name.first }
+      - "users2_address_address": ${ users[1].address.address }
+      - "users2_address_unit": ${ users[1].address.unit }
+      - "users2_address_city": ${ users[1].address.city }
+      - "users2_address_zip": ${ users[1].address.zip }
+      - "users2_address_state": ${ users[1].address.state }
+      - "users2_phone_number": ${ users[1].phone_number }
+      - "users3_name_first": ${ users[2].name.first }
+      - "users3_name_middle_initial": ${ users[2].name.middle_initial() }
+      - "users3_name_last": ${ users[2].name.last }
+      - "users3_address_address": ${ users[2].address.address }
+      - "users3_address_unit": ${ users[2].address.unit }
+      - "users3_address_city": ${ users[2].address.city }
+      - "users3_address_state": ${ users[2].address.state }
+      - "users3_address_zip": ${ users[2].address.zip }
+      - "users3_phone_number": ${ users[2].phone_number }
+      - "suretor3_address_on_one_line": ${ suretor3_address_on_one_line }
+      - "fiduciary_name": ${ fiduciary_name }
+      - "suretor3_name": ${ suretor3_name }
+      - "users2_signature": ${ users[1].signature_if_final(i) }
+      - "users3_signature": ${ users[2].signature_if_final(i) }
+      # It's a signature: test which file version this is; leave empty unless it's the final version)
+      - "suretor1_signature": ${ suretor1_signature if i == "final" else '' }
+      # It's a signature: test which file version this is; leave empty unless it's the final version)
+      - "suretor2_signature": ${ suretor2_signature if i == "final" else '' }
+      - "suretor3_address_state": ${ suretor3_address_state }
+      # It's a signature: test which file version this is; leave empty unless it's the final version)
+      - "suretor3_signature": ${ suretor3_signature if i == "final" else '' }
+
+
